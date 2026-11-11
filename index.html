@@ -96,7 +96,7 @@ function analyze(text){
  }
  // Renforcement des scénarios de fraude courants détectés par le banc d'essai.
  // Ces règles restent heuristiques : elles augmentent la vigilance sans prétendre prouver une fraude.
- const identityRequest=/\\b(?:pièce d'identité|piece d'identite|carte nationale d'identité|carte nationale d'identite|cni|passeport|permis de conduire|titre de séjour|titre de sejour)\\b/i.test(t)
+ const identityRequest=/\b(?:pièce d'identité|piece d'identite|carte nationale d'identité|carte nationale d'identite|cni|passeport|permis de conduire|titre de séjour|titre de sejour)\b/i.test(t)
    && /(?:envoyez|transmettez|communiquez|fournissez|joignez|déposez|deposez|scannez|téléversez|televersez|copie|photo)/i.test(t);
  if(identityRequest){
    flags.push('ALERTE FORTE : le message demande une pièce d’identité ou un document officiel. Ne transmettez pas ce document via un lien ou un message inattendu.');
