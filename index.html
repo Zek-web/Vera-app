@@ -71,6 +71,14 @@ function analyze(text){
    flags.push('ALERTE FORTE : colis prétendument bloqué avec demande de frais ou de paiement — scénario très fréquent de fraude à la livraison.');
    score=Math.max(score,78);
  }
+ // Combinaison de hameçonnage bancaire : menace sur le compte + demande d'identifiants ou de codes.
+ const bank=/banque|bancaire|compte|carte bancaire|espace client/i.test(t);
+ const accountThreat=/suspendu|bloqué|bloquee|fermé|ferme|désactivé|desactive|restreint|verrouillé|verrouille/i.test(t);
+ const credentialRequest=/identifiants|mot de passe|code de sécurité|code sms|code reçu|confirmer.*(accès|identifiant|compte)|valider.*(compte|identifiant)/i.test(t);
+ if(bank && accountThreat && credentialRequest){
+   flags.push('ALERTE FORTE : menace de suspension du compte associée à une demande d’identifiants ou de codes — procédé typique d’hameçonnage bancaire.');
+   score=Math.max(score,75);
+ }
  const urls=text.match(/https?:\/\/[^\s)]+/gi)||[];
  for(const u of urls){try{const host=new URL(u).hostname;if(!/^(www\.)?(service-public\.fr|impots\.gouv\.fr|ameli\.fr|laposte\.fr)$/.test(host)){flags.push('Le domaine du lien doit être vérifié indépendamment : '+host+'.');score+=10;}}catch{flags.push('Le lien ne semble pas correctement formé.');score+=8;}}
  if(kind==='payment'){score+=10;flags.push('Une demande de paiement nécessite une vérification indépendante du bénéficiaire et du motif.');}
