@@ -95,23 +95,25 @@ function analyze(text){
    score=Math.max(score, requestedSensitive.some(([re])=>/carte|cryptogramme|cvv|mot de passe|code secret|code de sécurité|code de securite|code sms|otp|identifiants/i.test(re.source))?92:85);
  }
  // Fraude au changement de RIB : vérifier tout changement de bénéficiaire par un autre canal.
- const bankChange=/(?:nouveau|nouvelle|changement|modification|mise à jour|mise a jour).{0,45}(?:rib|iban|coordonnées bancaires|coordonnees bancaires|compte bancaire)|(?:rib|iban|coordonnées bancaires|coordonnees bancaires).{0,45}(?:modifié|modifie|changé|change|nouveau|nouvelle)/i.test(t);
- const transferRequest=/(?:virement|virer|régler|regler|payer|paiement|bénéficiaire|beneficiaire)/i.test(t);
+ // Faux changement de RIB : le nom de la banque et le RIB peuvent être éloignés dans la phrase.
+ const bankChange=/(?:changement|modification|nouveau|nouvelle|a changé|a change|avons changé|avons change|change de banque|coordonnées bancaires mises à jour|coordonnees bancaires mises a jour)/i.test(t)
+   && /\b(?:rib|iban|bic|coordonnées bancaires|coordonnees bancaires|compte bancaire|nouveau compte)\b/i.test(t);
+ const transferRequest=/(?:virement|virer|effectuer.{0,45}paiement|prochain.{0,30}paiement|régler|regler|payer|paiement|bénéficiaire|beneficiaire)/i.test(t);
  if(bankChange && transferRequest){
-   flags.push('ALERTE FORTE : changement de coordonnées bancaires associé à un paiement ou virement. Risque de fraude au faux RIB. Confirmez le changement en appelant votre interlocuteur sur un numéro déjà connu, jamais celui du message.');
-   score=Math.max(score,90);
+   flags.push('ALERTE FORTE : changement de banque ou de RIB associé à un virement ou paiement. Risque de fraude au faux RIB. Confirmez par téléphone avec un numéro déjà connu, jamais avec les coordonnées du message.');
+   score=Math.max(score,95);
  }
- // Prise de contrôle à distance : un inconnu ne doit pas guider l'installation d'un outil d'accès.
- const remoteTool=/(?:anydesk|teamviewer|rustdesk|assistance à distance|assistance a distance|prise en main à distance|prise en main a distance|contrôle à distance|controle a distance)/i.test(t);
- const installOrAccess=/(?:installer|télécharger|telecharger|ouvrir|communiquer|donner|autoriser|accorder|activer|code de session|identifiant de session)/i.test(t);
+ // Prise de contrôle à distance : reconnaître les verbes conjugués et les demandes de code.
+ const remoteTool=/(?:anydesk|teamviewer|rustdesk|assistance.{0,20}distance|prise en main.{0,20}distance|contrôle.{0,20}distance|controle.{0,20}distance)/i.test(t);
+ const installOrAccess=/(?:install\w*|télécharg\w*|telecharg\w*|ouvr\w*|communiqu\w*|donn\w*|autoris\w*|accord\w*|activ\w*|code.{0,25}connexion|code.{0,25}session|identifiant.{0,25}session)/i.test(t);
  if(remoteTool && installOrAccess){
-   flags.push('ALERTE FORTE : le message évoque un outil ou une prise en main à distance. N’installez rien et ne donnez aucun accès à une personne qui vous contacte de façon inattendue.');
-   score=Math.max(score,88);
+   flags.push('ALERTE FORTE : le message demande d’installer ou d’utiliser un outil de prise en main à distance. N’installez rien et ne donnez aucun accès à une personne qui vous contacte de façon inattendue.');
+   score=Math.max(score,95);
  }
- // Pression au secret ou isolement de la victime.
- if(/(?:ne (?:dites|parlez|prévenez|prevenez) à personne|gardez (?:cela|ça) secret|confidentiel.{0,30}(?:virement|paiement)|ne contactez pas votre banque)/i.test(t)){
-   flags.push('Signal d’alerte : on vous demande de garder le secret ou de ne pas contacter votre banque. Prenez le temps de vérifier avec un interlocuteur officiel indépendant.');
-   score=Math.max(score,78);
+ // Secret, confidentialité imposée ou interdiction de vérifier.
+ if(/(?:ne (?:dites|parlez|prévenez|prevenez|contactez|appelez).{0,30}(?:personne|banque)|gardez.{0,30}(?:secret|confidentiel)|(?:doit|devra) rester confidentiel(?:le)?|opération.{0,35}confidentiel(?:le)?|ne contactez pas votre banque)/i.test(t)){
+   flags.push('ALERTE FORTE : le message cherche à vous empêcher d’en parler ou de vérifier. C’est un signal fréquent de manipulation. Contactez votre banque par un canal officiel indépendant.');
+   score=Math.max(score,90);
  }
  const urls=text.match(/https?:\/\/[^\s)]+/gi)||[];
  for(const u of urls){try{const host=new URL(u).hostname;if(!/^(www\.)?(service-public\.fr|impots\.gouv\.fr|ameli\.fr|laposte\.fr)$/.test(host)){flags.push('Le domaine du lien doit être vérifié indépendamment : '+host+'.');score+=10;}}catch{flags.push('Le lien ne semble pas correctement formé.');score+=8;}}
