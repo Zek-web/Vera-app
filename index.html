@@ -94,6 +94,25 @@ function analyze(text){
    flags.push('ALERTE DONNÉES SENSIBLES : ce message demande '+categories.join(' et ')+'. Ne transmettez aucune donnée via le message ou son lien. Contactez l’organisme par son application, son site ou son numéro officiel trouvé indépendamment.');
    score=Math.max(score, requestedSensitive.some(([re])=>/carte|cryptogramme|cvv|mot de passe|code secret|code de sécurité|code de securite|code sms|otp|identifiants/i.test(re.source))?92:85);
  }
+ // Fraude au changement de RIB : vérifier tout changement de bénéficiaire par un autre canal.
+ const bankChange=/(?:nouveau|nouvelle|changement|modification|mise à jour|mise a jour).{0,45}(?:rib|iban|coordonnées bancaires|coordonnees bancaires|compte bancaire)|(?:rib|iban|coordonnées bancaires|coordonnees bancaires).{0,45}(?:modifié|modifie|changé|change|nouveau|nouvelle)/i.test(t);
+ const transferRequest=/(?:virement|virer|régler|regler|payer|paiement|bénéficiaire|beneficiaire)/i.test(t);
+ if(bankChange && transferRequest){
+   flags.push('ALERTE FORTE : changement de coordonnées bancaires associé à un paiement ou virement. Risque de fraude au faux RIB. Confirmez le changement en appelant votre interlocuteur sur un numéro déjà connu, jamais celui du message.');
+   score=Math.max(score,90);
+ }
+ // Prise de contrôle à distance : un inconnu ne doit pas guider l'installation d'un outil d'accès.
+ const remoteTool=/(?:anydesk|teamviewer|rustdesk|assistance à distance|assistance a distance|prise en main à distance|prise en main a distance|contrôle à distance|controle a distance)/i.test(t);
+ const installOrAccess=/(?:installer|télécharger|telecharger|ouvrir|communiquer|donner|autoriser|accorder|activer|code de session|identifiant de session)/i.test(t);
+ if(remoteTool && installOrAccess){
+   flags.push('ALERTE FORTE : le message évoque un outil ou une prise en main à distance. N’installez rien et ne donnez aucun accès à une personne qui vous contacte de façon inattendue.');
+   score=Math.max(score,88);
+ }
+ // Pression au secret ou isolement de la victime.
+ if(/(?:ne (?:dites|parlez|prévenez|prevenez) à personne|gardez (?:cela|ça) secret|confidentiel.{0,30}(?:virement|paiement)|ne contactez pas votre banque)/i.test(t)){
+   flags.push('Signal d’alerte : on vous demande de garder le secret ou de ne pas contacter votre banque. Prenez le temps de vérifier avec un interlocuteur officiel indépendant.');
+   score=Math.max(score,78);
+ }
  const urls=text.match(/https?:\/\/[^\s)]+/gi)||[];
  for(const u of urls){try{const host=new URL(u).hostname;if(!/^(www\.)?(service-public\.fr|impots\.gouv\.fr|ameli\.fr|laposte\.fr)$/.test(host)){flags.push('Le domaine du lien doit être vérifié indépendamment : '+host+'.');score+=10;}}catch{flags.push('Le lien ne semble pas correctement formé.');score+=8;}}
  if(kind==='payment'){score+=10;flags.push('Une demande de paiement nécessite une vérification indépendante du bénéficiaire et du motif.');}
