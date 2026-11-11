@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="VERA vous aide à repérer les signaux d'alerte dans les messages, liens et demandes suspectes.">
+<link rel="manifest" href="./manifest.json">
+<title>VERA — Vérifiez avant d'agir</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--panel2:#18263a;--text:#f3f6fb;--muted:#aab7c9;--line:#26364d;--mint:#8be0c2;--blue:#91b9ff;--red:#ff8585;--amber:#ffd27a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1c3850 0,transparent 45%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+main{max-width:760px;margin:auto;padding:24px 18px 60px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.16em}.mark{width:38px;height:38px;border:1px solid #4d766f;border-radius:13px;display:grid;place-items:center;color:var(--mint);font-size:20px}.tag{font-size:12px;color:var(--mint);border:1px solid #31584f;border-radius:99px;padding:5px 10px}
+h1{font-size:clamp(34px,8vw,54px);line-height:1.05;letter-spacing:-.04em;margin:0 0 14px}.lead{color:var(--muted);max-width:590px;margin:0 0 26px}.panel{background:linear-gradient(150deg,#17263a,#101a2a);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 18px 55px #0003}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);border-radius:12px;padding:9px 13px;background:#0e1827;color:var(--muted);font:inherit;cursor:pointer}.tab[aria-pressed=true]{background:#234238;border-color:#4d8c78;color:#d7fff0}
+textarea{width:100%;min-height:150px;resize:vertical;border:1px solid #34465e;border-radius:14px;background:#0a1422;color:var(--text);padding:15px;font:inherit;outline:none}textarea:focus{border-color:var(--mint)}.hint{font-size:13px;color:var(--muted);margin:9px 0 16px}.actions{display:flex;gap:10px;flex-wrap:wrap}.primary,.secondary{border:0;border-radius:13px;padding:12px 17px;font:700 15px system-ui;cursor:pointer}.primary{background:var(--mint);color:#09231c}.secondary{background:#22334a;color:var(--text);border:1px solid #3a506b}
+.result{margin-top:18px;display:none}.result.show{display:block}.resultHead{display:flex;gap:14px;align-items:center}.score{width:66px;height:66px;display:grid;place-items:center;border-radius:18px;background:#20334a;font-size:23px;font-weight:800;flex:none}.risk{font-weight:800;font-size:20px}.risk.low{color:var(--mint)}.risk.medium{color:var(--amber)}.risk.high{color:var(--red)}.result p{color:var(--muted)}.signals{padding-left:20px;color:#dce6f3}.notice{border:1px solid #66532d;background:#2b2519;color:#ffe6b2;border-radius:13px;padding:12px 14px;font-size:13px;margin-top:15px}
+section.info{margin-top:25px}.info h2{font-size:19px;margin:0 0 8px}.info p{color:var(--muted);margin:0}.footer{color:#8191a6;font-size:12px;text-align:center;margin-top:28px}
+@media(min-width:600px){main{padding-top:42px}.panel{padding:26px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div class="brand"><span class="mark">V</span><span>VERA</span></div><span class="tag">BÊTA · GRATUIT</span></header>
+<h1>Avant de cliquer,<br>prenez un instant.</h1>
+<p class="lead">Collez ici un SMS, un e-mail ou un lien qui vous semble suspect. VERA repère des signaux d’alerte et vous aide à décider quoi vérifier.</p>
+<div class="panel">
+<div class="tabs" aria-label="Type de contenu">
+<button class="tab" type="button" aria-pressed="true" data-kind="message">SMS / e-mail</button>
+<button class="tab" type="button" aria-pressed="false" data-kind="link">Lien</button>
+<button class="tab" type="button" aria-pressed="false" data-kind="payment">Demande de paiement</button>
+</div>
+<label for="content"><strong>Que souhaitez-vous vérifier ?</strong></label>
+<textarea id="content" maxlength="10000" placeholder="Collez le texte du message ou le lien ici…"></textarea>
+<p class="hint">Conseil : masquez vos noms, numéros, adresses et codes personnels avant de coller un message.</p>
+<div class="actions"><button class="primary" id="analyze">Analyser les signaux</button><button class="secondary" id="clear">Effacer</button></div>
+<div class="result" id="result" aria-live="polite">
+<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+<div class="resultHead"><div class="score" id="score">—</div><div><div class="risk" id="risk">Analyse</div><div id="summary" style="color:var(--muted)"></div></div></div>
+<h3>Ce qui mérite votre attention</h3><ul class="signals" id="signals"></ul>
+<div class="notice" id="advice"></div>
+</div>
+</div>
+<section class="info"><h2>Comment utiliser VERA ?</h2><p>Ne cliquez pas sur le lien et ne payez pas tant que vous n’avez pas vérifié la demande par un canal officiel trouvé indépendamment (site ou numéro officiel).</p></section>
+<section class="info"><h2>Une aide, pas une garantie</h2><p>Cette version bêta effectue une vérification automatique simple à partir du texte fourni. Elle ne consulte pas les bases de données des autorités et ne peut pas certifier qu’un message est authentique. Un résultat rassurant ne garantit jamais l’absence de fraude.</p></section>
+<div class="footer">VERA · Comprendre. Vérifier. Décider.<br>Vos textes restent dans votre navigateur dans cette version.</div>
+</main>
+<script>
+let kind='message';
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{kind=b.dataset.kind;document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
+const $=id=>document.getElementById(id);
+function analyze(text){
+ const t=text.toLowerCase(), flags=[];let score=5;
+ const tests=[
+  [/urgence|urgent|immédiat|dans les 24 ?h|dernier rappel|sous 24 ?heures|suspendu|bloqué|expir(e|é)/i,'Le message met la pression avec une urgence ou une menace.',22],
+  [/mot de passe|code de sécurité|code sms|code reçu|identifiants|numéro de carte|cryptogramme|cvv|coordonnées bancaires/i,'Il demande des informations sensibles ou des codes.',28],
+  [/payer|paiement|virement|amende|rembour sement|remboursement|facture|livraison|colis|frais de douane/i,'Il évoque un paiement, une facture, un colis ou un remboursement.',12],
+  [/cliquez ici|cliquer ici|suivre ce lien|confirmer maintenant|mettre à jour/i,'Il pousse à cliquer ou à confirmer une action.',12],
+  [/gouv-|ameli|impôts|impots|banque|paypal|netflix|chronopost|colissimo|mondial relay/i,'Une marque ou un organisme connu est mentionné : vérifiez que l’expéditeur est bien officiel.',8],
+  [/(bit\.ly|tinyurl|t\.co|cutt\.ly|is\.gd|rb\.gy)/i,'Le lien semble utiliser un raccourcisseur d’URL.',20],
+  [/@[^\s]+\.(top|xyz|click|work|zip|mov)(\b|$)/i,'L’adresse e-mail utilise une extension inhabituelle.',14],
+  [/cadeau|gagné|gagnez|lot exceptionnel|récompense|investissement garanti/i,'Une promesse de gain ou de récompense apparaît.',12]
+ ];
+ for(const [re,msg,pts] of tests){if(re.test(text)){flags.push(msg);score+=pts;}}
+ const urls=text.match(/https?:\/\/[^\s)]+/gi)||[];
+ for(const u of urls){try{const host=new URL(u).hostname;if(!/^(www\.)?(service-public\.fr|impots\.gouv\.fr|ameli\.fr|laposte\.fr)$/.test(host)){flags.push('Le domaine du lien doit être vérifié indépendamment : '+host+'.');score+=10;}}catch{flags.push('Le lien ne semble pas correctement formé.');score+=8;}}
+ if(kind==='payment'){score+=10;flags.push('Une demande de paiement nécessite une vérification indépendante du bénéficiaire et du motif.');}
+ score=Math.min(96,score);
+ let level=score>=55?'high':score>=28?'medium':'low';
+ return {score,level,flags};
+}
+$('analyze').addEventListener('click',()=>{
+ const text=$('content').value.trim();if(!text){$('content').focus();return;}
+ const r=analyze(text), box=$('result');box.classList.add('show');
+ $('score').textContent=r.score+'/100';$('risk').textContent=r.level==='high'?'Plusieurs signaux d’alerte':r.level==='medium'?'Prudence recommandée':'Peu de signaux détectés';
+ $('risk').className='risk '+(r.level==='high'?'high':r.level==='medium'?'medium':'low');
+ $('summary').textContent=r.level==='high'?'Ne cliquez pas et ne payez pas avant vérification.':r.level==='medium'?'Prenez le temps de vérifier par un canal officiel.':'Aucun signal évident détecté par cette vérification limitée.';
+ $('signals').replaceChildren();
+ (r.flags.length?r.flags:['Aucun signal connu détecté dans le texte fourni. Cela ne prouve pas que le message est authentique.']).forEach(s=>{const li=document.createElement('li');li.textContent=s;$('signals').append(li);});
+ $('advice').textContent='À faire : ouvrez vous-même l’application ou le site officiel (sans utiliser le lien reçu), ou appelez le numéro figurant sur un document officiel. Ne communiquez jamais un code de sécurité.';
+});
+$('clear').addEventListener('click',()=>{$('content').value='';$('result').classList.remove('show');});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
