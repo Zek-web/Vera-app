@@ -62,19 +62,28 @@ function analyze(text){
   [/cadeau|gagné|gagnez|lot exceptionnel|récompense|investissement garanti/i,'Une promesse de gain ou de récompense apparaît.',12]
  ];
  for(const [re,msg,pts] of tests){if(re.test(text)){flags.push(msg);score+=pts;}}
+ // Combinaison particulièrement suspecte : faux frais de livraison / colis bloqué.
+ // Plusieurs indices réunis déclenchent une alerte forte, même sans URL visible.
+ const delivery=/colis|paquet|livraison|chronopost|colissimo|mondial relay/i.test(t);
+ const blocked=/bloqué|bloquee|retenu|en attente|non distribué|non distribue|échec de livraison|echec de livraison/i.test(t);
+ const payment=/payer|paiement|régler|regler|frais|1[,.]?[0-9]{1,2} ?€|euros?|droits de douane|taxe/i.test(t);
+ if(delivery && blocked && payment){
+   flags.push('ALERTE FORTE : colis prétendument bloqué avec demande de frais ou de paiement — scénario très fréquent de fraude à la livraison.');
+   score=Math.max(score,78);
+ }
  const urls=text.match(/https?:\/\/[^\s)]+/gi)||[];
  for(const u of urls){try{const host=new URL(u).hostname;if(!/^(www\.)?(service-public\.fr|impots\.gouv\.fr|ameli\.fr|laposte\.fr)$/.test(host)){flags.push('Le domaine du lien doit être vérifié indépendamment : '+host+'.');score+=10;}}catch{flags.push('Le lien ne semble pas correctement formé.');score+=8;}}
  if(kind==='payment'){score+=10;flags.push('Une demande de paiement nécessite une vérification indépendante du bénéficiaire et du motif.');}
- score=Math.min(96,score);
+ score=Math.min(99,score);
  let level=score>=55?'high':score>=28?'medium':'low';
  return {score,level,flags};
 }
 $('analyze').addEventListener('click',()=>{
  const text=$('content').value.trim();if(!text){$('content').focus();return;}
  const r=analyze(text), box=$('result');box.classList.add('show');
- $('score').textContent=r.score+'/100';$('risk').textContent=r.level==='high'?'Plusieurs signaux d’alerte':r.level==='medium'?'Prudence recommandée':'Peu de signaux détectés';
+ $('score').textContent=r.score+'/100';$('risk').textContent=r.level==='high'?'ALERTE — risque élevé de fraude':r.level==='medium'?'Prudence recommandée':'Peu de signaux détectés';
  $('risk').className='risk '+(r.level==='high'?'high':r.level==='medium'?'medium':'low');
- $('summary').textContent=r.level==='high'?'Ne cliquez pas et ne payez pas avant vérification.':r.level==='medium'?'Prenez le temps de vérifier par un canal officiel.':'Aucun signal évident détecté par cette vérification limitée.';
+ $('summary').textContent=r.level==='high'?'Ce message présente des indices sérieux de fraude. Ne cliquez pas, ne répondez pas et ne payez pas.':r.level==='medium'?'Prenez le temps de vérifier par un canal officiel.':'Aucun signal évident détecté par cette vérification limitée.';
  $('signals').replaceChildren();
  (r.flags.length?r.flags:['Aucun signal connu détecté dans le texte fourni. Cela ne prouve pas que le message est authentique.']).forEach(s=>{const li=document.createElement('li');li.textContent=s;$('signals').append(li);});
  $('advice').textContent='À faire : ouvrez vous-même l’application ou le site officiel (sans utiliser le lien reçu), ou appelez le numéro figurant sur un document officiel. Ne communiquez jamais un code de sécurité.';
