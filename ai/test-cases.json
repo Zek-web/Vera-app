@@ -1,0 +1,357 @@
+{
+  "version": "1.0",
+  "language": "fr",
+  "description": "50 cas entièrement fictifs pour évaluer VERA hors ligne. Les niveaux attendus sont des objectifs de test, pas des vérités absolues.",
+  "cases": [
+    {
+      "id": "S01",
+      "category": "livraison",
+      "text": "Votre colis est bloqué. Payez 1,99 € ici pour le recevoir.",
+      "expectedLevel": "high",
+      "expectedSignal": "colis bloqué + paiement"
+    },
+    {
+      "id": "S02",
+      "category": "banque",
+      "text": "Votre compte bancaire sera suspendu. Confirmez immédiatement vos identifiants.",
+      "expectedLevel": "high",
+      "expectedSignal": "menace bancaire + identifiants"
+    },
+    {
+      "id": "S03",
+      "category": "données",
+      "text": "Transmettez votre RIB pour recevoir votre remboursement.",
+      "expectedLevel": "high",
+      "expectedSignal": "demande de RIB"
+    },
+    {
+      "id": "S04",
+      "category": "données",
+      "text": "Veuillez envoyer une copie de votre pièce d'identité pour finaliser votre dossier.",
+      "expectedLevel": "high",
+      "expectedSignal": "demande de pièce d'identité"
+    },
+    {
+      "id": "S05",
+      "category": "données",
+      "text": "Communiquez le code reçu par SMS pour annuler le paiement suspect.",
+      "expectedLevel": "high",
+      "expectedSignal": "demande de code de sécurité"
+    },
+    {
+      "id": "S06",
+      "category": "faux-rib",
+      "text": "Nos coordonnées bancaires ont changé. Effectuez le prochain virement sur ce nouvel IBAN.",
+      "expectedLevel": "high",
+      "expectedSignal": "changement de RIB + virement"
+    },
+    {
+      "id": "S07",
+      "category": "prise-de-controle",
+      "text": "Installez AnyDesk et communiquez-nous le code de connexion.",
+      "expectedLevel": "high",
+      "expectedSignal": "outil de contrôle à distance"
+    },
+    {
+      "id": "S08",
+      "category": "manipulation",
+      "text": "Ne contactez surtout pas votre banque et gardez cette opération confidentielle.",
+      "expectedLevel": "high",
+      "expectedSignal": "isolement + secret"
+    },
+    {
+      "id": "S09",
+      "category": "phishing",
+      "text": "Dernier rappel : cliquez ici pour mettre à jour votre espace client bancaire.",
+      "expectedLevel": "medium",
+      "expectedSignal": "urgence + marque + clic"
+    },
+    {
+      "id": "S10",
+      "category": "remboursement",
+      "text": "Vous avez droit à un remboursement de 127 €. Cliquez pour confirmer vos coordonnées bancaires.",
+      "expectedLevel": "high",
+      "expectedSignal": "remboursement + données bancaires"
+    },
+    {
+      "id": "S11",
+      "category": "faux-support",
+      "text": "Le service sécurité détecte une anomalie. Donnez votre mot de passe pour sécuriser votre compte.",
+      "expectedLevel": "high",
+      "expectedSignal": "demande de mot de passe"
+    },
+    {
+      "id": "S12",
+      "category": "faux-amende",
+      "text": "Une amende est en attente. Réglez 35 € avant ce soir via ce lien raccourci bit.ly/abc123.",
+      "expectedLevel": "high",
+      "expectedSignal": "urgence + paiement + URL raccourcie"
+    },
+    {
+      "id": "S13",
+      "category": "faux-cadeau",
+      "text": "Félicitations, vous avez gagné un smartphone. Cliquez pour réclamer votre lot exceptionnel.",
+      "expectedLevel": "medium",
+      "expectedSignal": "gain inattendu + clic"
+    },
+    {
+      "id": "S14",
+      "category": "faux-investissement",
+      "text": "Investissement garanti : doublez votre capital en 30 jours, sans aucun risque.",
+      "expectedLevel": "medium",
+      "expectedSignal": "promesse de gain garanti"
+    },
+    {
+      "id": "S15",
+      "category": "phishing",
+      "text": "Votre compte PayPal est restreint. Confirmez maintenant vos informations.",
+      "expectedLevel": "high",
+      "expectedSignal": "marque + menace + action"
+    },
+    {
+      "id": "S16",
+      "category": "faux-livraison",
+      "text": "Votre livraison nécessite des frais de douane de 2,50 €. Payez ici.",
+      "expectedLevel": "medium",
+      "expectedSignal": "frais de livraison + paiement"
+    },
+    {
+      "id": "S17",
+      "category": "faux-administration",
+      "text": "Votre dossier Ameli expire aujourd'hui. Mettez à jour vos informations personnelles.",
+      "expectedLevel": "high",
+      "expectedSignal": "urgence + organisme + données"
+    },
+    {
+      "id": "S18",
+      "category": "faux-facture",
+      "text": "Veuillez régler la facture impayée en cliquant sur ce lien.",
+      "expectedLevel": "medium",
+      "expectedSignal": "paiement + clic"
+    },
+    {
+      "id": "S19",
+      "category": "faux-emploi",
+      "text": "Nous recrutons à domicile. Versez 49 € de frais de dossier pour commencer demain.",
+      "expectedLevel": "medium",
+      "expectedSignal": "paiement préalable"
+    },
+    {
+      "id": "S20",
+      "category": "faux-location",
+      "text": "Le propriétaire est à l'étranger. Envoyez un dépôt avant la visite pour réserver le logement.",
+      "expectedLevel": "medium",
+      "expectedSignal": "paiement anticipé atypique"
+    },
+    {
+      "id": "S21",
+      "category": "phishing",
+      "text": "Votre mot de passe doit être renouvelé. Cliquez ici pour continuer.",
+      "expectedLevel": "medium",
+      "expectedSignal": "mot de passe + clic"
+    },
+    {
+      "id": "S22",
+      "category": "faux-colis",
+      "text": "Chronopost : votre paquet est retenu, réglez les frais pour une nouvelle livraison.",
+      "expectedLevel": "high",
+      "expectedSignal": "colis retenu + frais"
+    },
+    {
+      "id": "S23",
+      "category": "faux-banque",
+      "text": "Un paiement suspect est en cours. Communiquez-moi le code reçu par SMS pour le bloquer.",
+      "expectedLevel": "high",
+      "expectedSignal": "demande de code"
+    },
+    {
+      "id": "S24",
+      "category": "faux-document",
+      "text": "Pour valider votre dossier, joignez votre avis d'imposition et un justificatif de domicile.",
+      "expectedLevel": "high",
+      "expectedSignal": "documents personnels"
+    },
+    {
+      "id": "S25",
+      "category": "faux-paiement",
+      "text": "Le bénéficiaire du virement a changé. Merci d'utiliser le nouveau RIB dès aujourd'hui.",
+      "expectedLevel": "high",
+      "expectedSignal": "modification RIB + virement implicite"
+    },
+    {
+      "id": "S26",
+      "category": "benin-banque",
+      "text": "Votre relevé mensuel est disponible dans votre application bancaire habituelle.",
+      "expectedLevel": "low",
+      "expectedSignal": "notification informative sans demande sensible"
+    },
+    {
+      "id": "S27",
+      "category": "benin-livraison",
+      "text": "Votre colis sera livré demain entre 9 h et 12 h. Aucune action n'est requise.",
+      "expectedLevel": "low",
+      "expectedSignal": "information logistique sans lien ni paiement"
+    },
+    {
+      "id": "S28",
+      "category": "benin-rendez-vous",
+      "text": "Rappel : votre rendez-vous est prévu mardi à 14 h. Bonne journée.",
+      "expectedLevel": "low",
+      "expectedSignal": "rappel neutre"
+    },
+    {
+      "id": "S29",
+      "category": "benin-ecole",
+      "text": "La réunion parents-professeurs aura lieu jeudi à 18 h dans la salle habituelle.",
+      "expectedLevel": "low",
+      "expectedSignal": "information scolaire"
+    },
+    {
+      "id": "S30",
+      "category": "benin-facture",
+      "text": "Votre facture du mois est disponible dans votre espace client habituel.",
+      "expectedLevel": "low",
+      "expectedSignal": "notification sans demande de paiement"
+    },
+    {
+      "id": "S31",
+      "category": "benin-ami",
+      "text": "Salut, tu es toujours disponible pour déjeuner demain ?",
+      "expectedLevel": "low",
+      "expectedSignal": "conversation ordinaire"
+    },
+    {
+      "id": "S32",
+      "category": "benin-administration",
+      "text": "Votre demande a bien été enregistrée. Vous recevrez une réponse dans votre espace officiel.",
+      "expectedLevel": "low",
+      "expectedSignal": "confirmation neutre"
+    },
+    {
+      "id": "S33",
+      "category": "benin-banque",
+      "text": "Un paiement de 24,90 € a été effectué avec votre carte. Consultez votre application si besoin.",
+      "expectedLevel": "low",
+      "expectedSignal": "notification de transaction sans demande de code"
+    },
+    {
+      "id": "S34",
+      "category": "benin-travail",
+      "text": "Bonjour, la réunion d'équipe commence à 10 h. Voici l'ordre du jour en pièce jointe.",
+      "expectedLevel": "low",
+      "expectedSignal": "message professionnel neutre"
+    },
+    {
+      "id": "S35",
+      "category": "benin-commerce",
+      "text": "Merci pour votre achat. Votre commande est confirmée et sera expédiée prochainement.",
+      "expectedLevel": "low",
+      "expectedSignal": "confirmation de commande"
+    },
+    {
+      "id": "S36",
+      "category": "phishing-lien",
+      "text": "Votre espace impots.gouv.fr nécessite une vérification urgente : cliquez ici.",
+      "expectedLevel": "medium",
+      "expectedSignal": "organisme + urgence + clic"
+    },
+    {
+      "id": "S37",
+      "category": "phishing-mail",
+      "text": "Votre facture est disponible. Connectez-vous sur support-client.example.top pour la consulter.",
+      "expectedLevel": "medium",
+      "expectedSignal": "domaine inhabituel"
+    },
+    {
+      "id": "S38",
+      "category": "faux-remboursement",
+      "text": "Un trop-perçu de 84 € vous sera remboursé après validation de votre carte bancaire.",
+      "expectedLevel": "high",
+      "expectedSignal": "remboursement + carte bancaire"
+    },
+    {
+      "id": "S39",
+      "category": "faux-securite",
+      "text": "Pour bloquer la fraude, donnez immédiatement votre numéro de carte et le cryptogramme.",
+      "expectedLevel": "high",
+      "expectedSignal": "demande de données carte"
+    },
+    {
+      "id": "S40",
+      "category": "faux-assistance",
+      "text": "Notre technicien va prendre la main à distance. Téléchargez TeamViewer et autorisez la connexion.",
+      "expectedLevel": "high",
+      "expectedSignal": "prise en main à distance"
+    },
+    {
+      "id": "S41",
+      "category": "faux-secret",
+      "text": "Ne prévenez personne, même votre conseiller. Cette opération doit rester confidentielle.",
+      "expectedLevel": "high",
+      "expectedSignal": "interdiction de vérifier"
+    },
+    {
+      "id": "S42",
+      "category": "faux-don",
+      "text": "Votre dossier d'aide nécessite une mise à jour urgente. Transmettez votre pièce d'identité et votre RIB via ce lien.",
+      "expectedLevel": "high",
+      "expectedSignal": "urgence + identité + RIB"
+    },
+    {
+      "id": "S43",
+      "category": "phishing",
+      "text": "Votre abonnement Netflix sera interrompu. Mettez à jour votre moyen de paiement.",
+      "expectedLevel": "medium",
+      "expectedSignal": "marque + menace + paiement"
+    },
+    {
+      "id": "S44",
+      "category": "faux-concours",
+      "text": "Vous êtes sélectionné pour recevoir un cadeau. Des frais de traitement de 3 € sont demandés.",
+      "expectedLevel": "medium",
+      "expectedSignal": "cadeau + frais"
+    },
+    {
+      "id": "S45",
+      "category": "faux-virement",
+      "text": "Le fournisseur vous demande de régler la facture sur un compte bancaire différent de celui indiqué auparavant.",
+      "expectedLevel": "medium",
+      "expectedSignal": "changement de coordonnées de paiement"
+    },
+    {
+      "id": "S46",
+      "category": "benin-code",
+      "text": "Votre code de retrait est disponible dans l'application que vous venez d'ouvrir.",
+      "expectedLevel": "low",
+      "expectedSignal": "contexte neutre mais mention d'un code"
+    },
+    {
+      "id": "S47",
+      "category": "benin-securite",
+      "text": "Pour votre sécurité, ne partagez jamais votre code de validation avec qui que ce soit.",
+      "expectedLevel": "low",
+      "expectedSignal": "conseil de sécurité, pas une demande"
+    },
+    {
+      "id": "S48",
+      "category": "ambigue",
+      "text": "Pouvez-vous me transmettre votre adresse e-mail professionnelle pour le suivi du dossier ?",
+      "expectedLevel": "low",
+      "expectedSignal": "donnée de contact non bancaire"
+    },
+    {
+      "id": "S49",
+      "category": "ambigue",
+      "text": "Merci de confirmer la réception du document, sans cliquer sur de lien ni transmettre d'information.",
+      "expectedLevel": "low",
+      "expectedSignal": "demande de confirmation simple"
+    },
+    {
+      "id": "S50",
+      "category": "ambigue",
+      "text": "Un paiement de 1,99 € est nécessaire pour finaliser votre inscription au service choisi.",
+      "expectedLevel": "medium",
+      "expectedSignal": "paiement à examiner selon contexte"
+    }
+  ]
+}
