@@ -94,6 +94,70 @@ function analyze(text){
    flags.push('ALERTE DONNÉES SENSIBLES : ce message demande '+categories.join(' et ')+'. Ne transmettez aucune donnée via le message ou son lien. Contactez l’organisme par son application, son site ou son numéro officiel trouvé indépendamment.');
    score=Math.max(score, requestedSensitive.some(([re])=>/carte|cryptogramme|cvv|mot de passe|code secret|code de sécurité|code de securite|code sms|otp|identifiants/i.test(re.source))?92:85);
  }
+ // Renforcement des scénarios de fraude courants détectés par le banc d'essai.
+ // Ces règles restent heuristiques : elles augmentent la vigilance sans prétendre prouver une fraude.
+ const identityRequest=/\\b(?:pièce d'identité|piece d'identite|carte nationale d'identité|carte nationale d'identite|cni|passeport|permis de conduire|titre de séjour|titre de sejour)\\b/i.test(t)
+   && /(?:envoyez|transmettez|communiquez|fournissez|joignez|déposez|deposez|scannez|téléversez|televersez|copie|photo)/i.test(t);
+ if(identityRequest){
+   flags.push('ALERTE FORTE : le message demande une pièce d’identité ou un document officiel. Ne transmettez pas ce document via un lien ou un message inattendu.');
+   score=Math.max(score,85);
+ }
+ const cardForRefund=/\b(?:remboursement|remboursé|rembourse|trop-perçu|trop perçu)\b/i.test(t)
+   && /\b(?:carte bancaire|numéro de carte|numero de carte|cryptogramme|cvv|cvc)\b/i.test(t);
+ if(cardForRefund){
+   flags.push('ALERTE FORTE : un remboursement est conditionné à des données de carte bancaire. Vérifiez la demande uniquement depuis le site ou l’application officielle.');
+   score=Math.max(score,92);
+ }
+ const bankUrgentClick=bank
+   && /(?:urgence|urgent|immédiat|immediat|dernier rappel|suspendu|bloqué|bloquee|restreint|expire)/i.test(t)
+   && /(?:cliquez|cliquer|lien|mettre à jour|mettre a jour|confirmer|valider)/i.test(t);
+ if(bankUrgentClick){
+   flags.push('ALERTE FORTE : urgence ou menace sur un service bancaire associée à une demande de clic ou de mise à jour. Ne passez pas par le lien reçu.');
+   score=Math.max(score,75);
+ }
+ const sensitivePaymentContext=/(?:régler|regler|payer|paiement|virement|frais|dépôt|depot|versez|verser|carte bancaire)/i.test(t);
+ const suspiciousCommercialContext=/(?:cadeau|gagné|gagnez|lot|récompense|recompense|investissement garanti|sans aucun risque|emploi|recrut|frais de dossier|propriétaire est à l'étranger|proprietaire est a l'etranger)/i.test(t);
+ if(suspiciousCommercialContext && sensitivePaymentContext){
+   flags.push('ALERTE : le message associe une promesse, une offre ou une situation atypique à une demande d’argent. Vérifiez l’interlocuteur et ne payez pas sous pression.');
+   score=Math.max(score,65);
+ }
+ const suspiciousInvestment=/investissement garanti|doublez votre capital|sans aucun risque/i.test(t);
+ if(suspiciousInvestment){
+   flags.push('ALERTE : une promesse de rendement garanti ou sans risque est un signal majeur de prudence.');
+   score=Math.max(score,65);
+ }
+ const suspiciousJob=/\b(?:recrutons|recrutement|emploi|job|travail à domicile|travail a domicile)\b/i.test(t)
+   && /(?:versez|verser|frais|payez|payer|dépôt|depot)/i.test(t);
+ if(suspiciousJob){
+   flags.push('ALERTE : une demande de paiement pour obtenir un emploi ou démarrer une activité est fortement suspecte.');
+   score=Math.max(score,65);
+ }
+ const suspiciousRental=/(?:propriétaire est à l'étranger|proprietaire est a l'etranger)/i.test(t)
+   && /(?:dépôt|depot|réserver|reserver|avant la visite|envoyez)/i.test(t);
+ if(suspiciousRental){
+   flags.push('ALERTE : demande de dépôt avant une visite ou transaction immobilière dans un contexte atypique. Vérifiez le bien et le propriétaire par des moyens indépendants.');
+   score=Math.max(score,60);
+ }
+ const accountInfoThreat=/(?:paypal|netflix|ameli|impôts|impots)/i.test(t)
+   && /(?:restreint|suspendu|interrompu|expire|expiration|bloqué|bloquee)/i.test(t)
+   && /(?:confirmez|confirmer|mettre à jour|mettre a jour|cliquez|cliquer|informations|moyen de paiement)/i.test(t);
+ if(accountInfoThreat){
+   flags.push('ALERTE : un service connu est associé à une menace ou une échéance et à une demande d’action. Accédez directement à l’application ou au site officiel.');
+   score=Math.max(score,65);
+ }
+ const deliveryFee=/\b(?:livraison|colis|chronopost|colissimo|mondial relay)\b/i.test(t)
+   && /(?:frais|taxe|douane|payer|paiement)/i.test(t);
+ if(deliveryFee && !blocked){
+   flags.push('Vigilance : une demande de frais liée à une livraison doit être vérifiée depuis le site officiel du transporteur.');
+   score=Math.max(score,45);
+ }
+ const bankChangePayment=/\b(?:compte bancaire|coordonnées bancaires|coordonnees bancaires|nouveau compte|nouvel IBAN|nouvel iban|RIB|IBAN)\b/i.test(t)
+   && /(?:changé|change|différent|different|nouveau|nouvelle)/i.test(t)
+   && /(?:virement|régler|regler|payer|paiement|bénéficiaire|beneficiaire)/i.test(t);
+ if(bankChangePayment){
+   flags.push('ALERTE FORTE : les coordonnées bancaires de paiement semblent avoir changé. Vérifiez avec le bénéficiaire via un contact déjà connu.');
+   score=Math.max(score,85);
+ }
  // Fraude au changement de RIB : vérifier tout changement de bénéficiaire par un autre canal.
  // Faux changement de RIB : le nom de la banque et le RIB peuvent être éloignés dans la phrase.
  const bankChange=/(?:changement|modification|nouveau|nouvelle|a changé|a change|avons changé|avons change|change de banque|coordonnées bancaires mises à jour|coordonnees bancaires mises a jour)/i.test(t)
