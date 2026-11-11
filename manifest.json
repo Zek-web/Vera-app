@@ -1,0 +1,11 @@
+{
+  "name": "VERA — Vérifiez avant d'agir",
+  "short_name": "VERA",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#101827",
+  "description": "Une aide pour repérer les signaux d'alerte dans les messages et liens suspects."
+}
